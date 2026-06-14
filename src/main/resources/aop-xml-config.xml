@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/aop
+        https://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <bean id="messageService"
+          class="com.wushu.aopmessage.service.MessageServiceImpl"/>
+
+    <bean id="messageAspect"
+          class="com.wushu.aopmessage.aspect.MessageXmlAspect"/>
+
+    <aop:config>
+        <aop:aspect ref="messageAspect">
+
+            <aop:pointcut id="sendPointcut"
+                          expression="execution(* com.wushu.aopmessage.service.MessageService.send(..))"/>
+
+            <aop:pointcut id="sendExceptionPointcut"
+                          expression="execution(* com.wushu.aopmessage.service.MessageService.sendException(..))"/>
+
+            <aop:before method="beforeSend"
+                        pointcut="execution(* com.wushu.aopmessage.service.MessageService.send(..)) and args(message)"
+                        arg-names="message"/>
+
+            <aop:around method="measureSendTime"
+                        pointcut-ref="sendPointcut"/>
+
+            <aop:after-returning method="afterSend"
+                                 pointcut-ref="sendPointcut"/>
+
+
+            <aop:after-throwing method="afterThrowingSendException"
+                                pointcut="execution(* com.wushu.aopmessage.service.MessageService.sendException(..))"
+                                throwing="exception"/>
+
+        </aop:aspect>
+    </aop:config>
+
+</beans>

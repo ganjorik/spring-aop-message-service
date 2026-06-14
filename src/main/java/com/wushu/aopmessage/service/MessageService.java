@@ -1,4 +1,8 @@
 package com.wushu.aopmessage.service;
 
-public class MessageService {
+public interface MessageService {
+
+	void send(String message);
+
+	void sendException(String message);
 }
